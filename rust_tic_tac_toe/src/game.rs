@@ -1,4 +1,6 @@
-#[derive(Display, Debug, Copy, Clone, Eq, PartialEq)]
+use rand::Rng;
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)] //Removed "Display" for now because error.
 pub enum Player {
     X,
     O
@@ -20,6 +22,13 @@ pub struct Board {
 
 impl Board {
     pub fn new(&self) -> Board {
+        let mut rng = rand::thread_rng();
+        let first_player = rng.gen_range(1, 2);
+        let first_player = match first_player {
+            1 => Player::O,
+            2 => Player::X,
+            _ => Player::O,
+        };
         Board {
             fields: {[
                 [None, None, None],
@@ -30,18 +39,16 @@ impl Board {
         }
     }
 
-    update
-
-    show
-
-    check_board_free
-
-    check_board_win
-
-    check_board_draw
-
-    pick_first_player
 
 
+    // update
+
+    // show
+
+    // check_board_free
+
+    // check_board_win
+
+    // check_board_draw
 
 }
