@@ -1,54 +1,56 @@
-use rand::Rng;
+// 1. Get player input.
+// 2. Get the unchanged board to display.
+// 3. Change the board by player input and redraw.
+// 4. AI and win conditions.
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)] //Removed "Display" for now because error.
-pub enum Player {
+use std::io::*;
+
+
+pub enum Letter {
     X,
-    O
+    O,
+}
+
+pub enum PlayerType {
+    human,
+    cpu,
+}
+
+
+pub struct Player {
+    pub player_type: PlayerType,
+    pub letter: Letter,
+    pub move_pick: u8,
 }
 
 impl Player {
-    pub fn opponent(&self) -> Player {
-        match *self {
-            Player::X => Player::O,
-            Player::O => Player::X,
+    pub fn get_move(&self) -> bool {
+        match self.player_type {
+            PlayerType::human => true,
+            PlayerType::cpu => true,
         }
+        
+        
+        // {
+    //         println!("Please choose a move.");
+    //         let mut move_pick = String::new();
+    //         std::io::stdin().read_line(&mut move_pick).expect("Failed to get player pick.");
+    // }
     }
 }
-#[derive(Copy, Clone)]
+
+
 pub struct Board {
-    pub fields: [[Option<Player>; 3]; 3],
-    pub next_player: Player,
+    board: Vec<char>,
 }
 
-impl Board {
-    pub fn new(&self) -> Board {
-        let mut rng = rand::thread_rng();
-        let first_player = rng.gen_range(1, 2);
-        let first_player = match first_player {
-            1 => Player::O,
-            2 => Player::X,
-            _ => Player::O,
-        };
-        Board {
-            fields: {[
-                [None, None, None],
-                [None, None, None],
-                [None, None, None],
-            ]},
-            next_player: first_player,
-        }
-    }
 
-
-
-    // update
-
-    // show
-
-    // check_board_free
-
-    // check_board_win
-
-    // check_board_draw
-
-}
+//Player and computer X, O
+//Draw a board
+// To get player input
+// To get computer input
+// Get the best for the computer
+// win condition
+// draw condition
+// Play again
+//Scoreboard
