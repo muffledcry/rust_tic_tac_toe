@@ -2,17 +2,27 @@
 // 4. AI and win conditions.
 
 use std::io::*;
+use rand::prelude::*;
+use std::fmt;
 
+#[derive(Debug)]
 pub enum Letter {
     X,
     O,
 }
 
+// impl fmt::Debug for Letter {
+
+// }
+
+#[derive(Debug)]
 pub enum PlayerType {
     human,
     cpu,
 }
 
+
+#[derive(Debug)]
 pub struct Player {
     pub player_type: PlayerType,
     pub letter: Letter,
@@ -20,6 +30,7 @@ pub struct Player {
 }
 
 impl Player {
+
     pub fn get_move(&self) -> u8 {
         match self.player_type {
             PlayerType::human => loop {
@@ -41,6 +52,8 @@ impl Player {
     }
 }
 
+
+
 pub struct Board {
     row_1: Vec<char>,
     row_2: Vec<char>,
@@ -61,8 +74,55 @@ impl Board {
         println!("{:?}", self.row_2);
         println!("{:?}", self.row_1);
     }
+
+    // pub fn update(&mut self) -> Board {
+        
+    // }
+
 }
 
+
+pub fn player_constructor() -> Vec<Player> {
+    let mut flipper = rand::thread_rng();
+    let coin_flip = flipper.gen_range(0,1);
+
+    if coin_flip == 0 {
+        let human = Player {
+            player_type: PlayerType::human,
+            letter: Letter::X,
+            move_pick: 0,
+        };
+
+        let computer = Player {
+            player_type: PlayerType::cpu,
+            letter: Letter::O,
+            move_pick: 0,
+        };
+
+        println!("You are letter X. You will go first.");
+        println!("");
+        let player_vec = vec![human, computer];
+        return player_vec
+    }else{
+        let human = Player {
+            player_type: PlayerType::human,
+            letter: Letter::O,
+            move_pick: 0,
+        };
+
+        let computer = Player {
+            player_type: PlayerType::cpu,
+            letter: Letter::X,
+            move_pick: 0,
+        };
+        println!("You are letter O. You will go second.");
+        println!("");
+
+        let player_vec = vec![human, computer];
+        return player_vec
+    }
+}
+    
 //Player and computer X, O
 //Draw a board
 // To get player input
