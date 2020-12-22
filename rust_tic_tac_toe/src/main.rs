@@ -1,5 +1,5 @@
 mod game;
-use game::{Board, Letter, Player, PlayerType, player_constructor};
+use game::{Board, Letter, Player, PlayerType,};
 use rand::prelude::*;
 
 
@@ -7,16 +7,14 @@ fn main() {
     let mut game_board = Board::new();
     game_board.draw_board();
 
-    let player_vec = player_constructor();
-    let mut human = &player_vec[0];
-    let computer = &player_vec[1];
-    println!("Human is: {:?}", human);
-    println!("Computer is: {:?}", computer);
+    let mut human = Player::new_human();
+    let computer = Player::new_computer(&human);
+    human.move_pick = human.get_move();
+    game_board = game_board.update(&human);
+    println!("Player is {:?}", human);
+    println!("Player is {:?}", computer);
+    game_board.draw_board();
 
-    human.get_move();
-    println!("Human is: {:?}", human);
-
-    
 }
 
 

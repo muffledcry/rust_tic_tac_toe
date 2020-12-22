@@ -5,7 +5,7 @@ use std::io::*;
 use rand::prelude::*;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Letter {
     X,
     O,
@@ -30,6 +30,45 @@ pub struct Player {
 }
 
 impl Player {
+
+    pub fn new_human() -> Player {
+        let mut flipper = rand::thread_rng();
+        let coin_flip = flipper.gen_range(0,2);
+
+        if coin_flip == 0 {
+            let human = Player {
+                player_type: PlayerType::human,
+                letter: Letter::X,
+                move_pick: 0,
+            };
+                return human
+        }else{
+            let human = Player {
+                player_type: PlayerType::human,
+                letter: Letter::O,
+                move_pick: 0,
+            };
+                return human
+        }
+    }
+
+    pub fn new_computer(human: &Player) -> Player {
+        if human.letter == Letter::X {
+            let computer = Player {
+                player_type: PlayerType::cpu,
+                letter: Letter::O,
+                move_pick: 0,
+            };
+            return computer
+        }else{
+            let computer = Player {
+                player_type : PlayerType::cpu,
+                letter: Letter::X,
+                move_pick: 0,
+            };
+            return computer
+        }
+    }
 
     pub fn get_move(&self) -> u8 {
         match self.player_type {
@@ -75,53 +114,71 @@ impl Board {
         println!("{:?}", self.row_1);
     }
 
-    // pub fn update(&mut self) -> Board {
-        
-    // }
-
-}
-
-
-pub fn player_constructor() -> Vec<Player> {
-    let mut flipper = rand::thread_rng();
-    let coin_flip = flipper.gen_range(0,1);
-
-    if coin_flip == 0 {
-        let human = Player {
-            player_type: PlayerType::human,
-            letter: Letter::X,
-            move_pick: 0,
+    pub fn update(mut self, player: &Player) -> Board {
+        let letter: char = match player.letter {
+            Letter::X => 'X',
+            Letter::O => 'O',
         };
 
-        let computer = Player {
-            player_type: PlayerType::cpu,
-            letter: Letter::O,
-            move_pick: 0,
-        };
+        match player.move_pick {
+            1 => self.row_1[(player.move_pick as usize)]= letter,
+            2 => self.row_1[(player.move_pick as usize)]= letter,
+            3 => self.row_1[(player.move_pick as usize)]= letter,
+            4 => self.row_2[((player.move_pick -3) as usize)]= letter,
+            5 => self.row_2[((player.move_pick-3) as usize)]= letter,
+            6 => self.row_2[((player.move_pick -3) as usize)]= letter,
+            7 => self.row_3[((player.move_pick -6) as usize)]= letter,
+            8 => self.row_3[((player.move_pick -6) as usize)]= letter,
+            9 => self.row_3[((player.move_pick -6) as usize)]= letter,
+            _ => println!("Some shit went bad."),
+        }
 
-        println!("You are letter X. You will go first.");
-        println!("");
-        let player_vec = vec![human, computer];
-        return player_vec
-    }else{
-        let human = Player {
-            player_type: PlayerType::human,
-            letter: Letter::O,
-            move_pick: 0,
-        };
-
-        let computer = Player {
-            player_type: PlayerType::cpu,
-            letter: Letter::X,
-            move_pick: 0,
-        };
-        println!("You are letter O. You will go second.");
-        println!("");
-
-        let player_vec = vec![human, computer];
-        return player_vec
+        return self
     }
+
 }
+
+
+// pub fn player_constructor() -> Vec<Player> {
+//     let mut flipper = rand::thread_rng();
+//     let coin_flip = flipper.gen_range(0,1);
+
+//     if coin_flip == 0 {
+//         let human = Player {
+//             player_type: PlayerType::human,
+//             letter: Letter::X,
+//             move_pick: 0,
+//         };
+
+//         let computer = Player {
+//             player_type: PlayerType::cpu,
+//             letter: Letter::O,
+//             move_pick: 0,
+//         };
+
+//         println!("You are letter X. You will go first.");
+//         println!("");
+//         let player_vec = vec![human, computer];
+//         return player_vec
+//     }else{
+//         let human = Player {
+//             player_type: PlayerType::human,
+//             letter: Letter::O,
+//             move_pick: 0,
+//         };
+
+//         let computer = Player {
+//             player_type: PlayerType::cpu,
+//             letter: Letter::X,
+//             move_pick: 0,
+//         };
+//         println!("You are letter O. You will go second.");
+//         println!("");
+
+//         let player_vec = vec![human, computer];
+//         return player_vec
+//     }
+// }
     
 //Player and computer X, O
 //Draw a board
