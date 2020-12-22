@@ -121,15 +121,15 @@ impl Board {
         };
 
         match player.move_pick {
-            1 => self.row_1[(player.move_pick as usize)]= letter,
-            2 => self.row_1[(player.move_pick as usize)]= letter,
-            3 => self.row_1[(player.move_pick as usize)]= letter,
-            4 => self.row_2[((player.move_pick -3) as usize)]= letter,
-            5 => self.row_2[((player.move_pick-3) as usize)]= letter,
-            6 => self.row_2[((player.move_pick -3) as usize)]= letter,
-            7 => self.row_3[((player.move_pick -6) as usize)]= letter,
-            8 => self.row_3[((player.move_pick -6) as usize)]= letter,
-            9 => self.row_3[((player.move_pick -6) as usize)]= letter,
+            1 => self.row_1[((player.move_pick -1) as usize)]= letter,
+            2 => self.row_1[((player.move_pick -1) as usize)]= letter,
+            3 => self.row_1[((player.move_pick-1) as usize)]= letter,
+            4 => self.row_2[((player.move_pick -4) as usize)]= letter,
+            5 => self.row_2[((player.move_pick-4) as usize)]= letter,
+            6 => self.row_2[((player.move_pick -4) as usize)]= letter,
+            7 => self.row_3[((player.move_pick -7) as usize)]= letter,
+            8 => self.row_3[((player.move_pick -7) as usize)]= letter,
+            9 => self.row_3[((player.move_pick -7) as usize)]= letter,
             _ => println!("Some shit went bad."),
         }
 
