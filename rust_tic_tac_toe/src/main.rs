@@ -8,12 +8,16 @@ fn main() {
     game_board.draw_board();
 
     let mut human = Player::new_human();
-    let computer = Player::new_computer(&human);
-    human.move_pick = human.get_move();
+    let mut computer = Player::new_computer(&human);
+    human.move_pick = human.get_move(&game_board);
     game_board = game_board.update(&human);
+    computer.move_pick = computer.get_move(&game_board);
+    game_board = game_board.update(&computer);
     println!("Player is {:?}", human);
     println!("Player is {:?}", computer);
     game_board.draw_board();
+    let available_moves = human.get_available(&game_board);
+    println!("The available moves are: {:?}", available_moves);
 
 }
 

@@ -1,5 +1,6 @@
-// 3. Change the board by player input and redraw.
-// 4. AI and win conditions.
+// 4. AI picks random corner (done).
+// 5. AI checks if corner is available using the get_available method(in progress).
+
 
 use std::io::*;
 use rand::prelude::*;
@@ -70,7 +71,7 @@ impl Player {
         }
     }
 
-    pub fn get_move(&self) -> u8 {
+    pub fn get_move(&self, board: &Board) -> u8 {
         match self.player_type {
             PlayerType::human => loop {
                 println!("Please choose a move.");
@@ -86,13 +87,72 @@ impl Player {
                     continue;
                 } 
             },
-            PlayerType::cpu => 0,
-        }
+            PlayerType::cpu => {
+
+                //Pick a corner.
+                let corner_rows = vec![1, 3];
+                let mut rng = rand::thread_rng();
+                let row_pick = corner_rows.choose(&mut rng).unwrap();
+                let corner_move = match row_pick {
+                    1 => {
+                        let choices: Vec<u8> = vec![1, 3];
+                        let choice = choices.choose(&mut rng).unwrap();
+                        *choice
+                    },
+                    3 => {
+                        let choices: Vec<u8> = vec![7, 9];
+                        let choice = choices.choose(&mut rng).unwrap();
+                        *choice
+                    },
+                    _ => {
+                        println!("What the fuck happened (line 103)?");
+                        return 0
+                    }
+                };
+
+
+
+                return corner_move
+            }
+        } 
     }
+
+    pub fn get_available(&self, board: &Board) -> Vec<u8> {
+        let mut available_vec: Vec<u8> = Vec::new();
+        if board.row_1[0] == '1' {
+            available_vec.push(1);
+        }
+        if board.row_1[1] == '2' {
+            available_vec.push(2);
+        }
+        if board.row_1[2] == '3' {
+            available_vec.push(3);
+        }
+        if board.row_2[0] == '4' {
+            available_vec.push(4);
+        }
+        if board.row_2[1] == '5' {
+            available_vec.push(5);
+        }
+        if board.row_2[2] == '6' {
+            available_vec.push(6);
+        }
+        if board.row_3[0] == '7' {
+            available_vec.push(7);
+        }
+        if board.row_3[1] == '8' {
+            available_vec.push(8);
+        }
+        if board.row_3[2] == '9' {
+            available_vec.push(9);
+        }
+        return available_vec
+}
+
 }
 
 
-
+#[derive(PartialEq, Debug)]
 pub struct Board {
     row_1: Vec<char>,
     row_2: Vec<char>,
