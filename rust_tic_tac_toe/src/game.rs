@@ -1,5 +1,6 @@
 // 4. AI picks random corner (done).
 // 5. AI checks if corner is available using the get_available method(in progress).
+// 6. Make game loop to check win condition AI (not started)
 
 
 use std::io::*;
@@ -16,7 +17,7 @@ pub enum Letter {
 
 // }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum PlayerType {
     human,
     cpu,
@@ -88,6 +89,10 @@ impl Player {
                 } 
             },
             PlayerType::cpu => {
+                let available_moves = self.get_available(board);
+                if available_moves.contains(&5) {
+                    return 5
+                }
 
                 //Pick a corner.
                 let corner_rows = vec![1, 3];
@@ -147,7 +152,138 @@ impl Player {
             available_vec.push(9);
         }
         return available_vec
-}
+    }
+
+    pub fn check_win(self, board: &Board) -> u8 {
+        let available_moves = self.get_available(board);
+
+        //Checks Across
+        if board.computer_choices.contains(&1) && board.computer_choices.contains(&2) {
+            if available_moves.contains(&3) {
+                return 3
+            }
+        }
+        if board.computer_choices.contains(&1) && board.computer_choices.contains(&3) {
+            if available_moves.contains(&2) {
+                return 2
+            }
+        }
+        if board.computer_choices.contains(&2) && board.computer_choices.contains(&3) {
+            if available_moves.contains(&1) {
+                return 1
+              }
+        }
+        if board.computer_choices.contains(&4) && board.computer_choices.contains(&5) {
+            if available_moves.contains(&6) {
+                return 6
+              }
+        }
+        if board.computer_choices.contains(&4) && board.computer_choices.contains(&6) {
+            if available_moves.contains(&5) {
+                return 5
+              }
+        }
+        if board.computer_choices.contains(&5) && board.computer_choices.contains(&6) {
+            if available_moves.contains(&4) {
+                return 4
+              }
+        }
+        if board.computer_choices.contains(&7) && board.computer_choices.contains(&8) {
+            if available_moves.contains(&9) {
+                return 9
+              }
+        }
+        if board.computer_choices.contains(&7) && board.computer_choices.contains(&9) {
+            if available_moves.contains(&8) {
+                return 8
+              }
+        }
+        if board.computer_choices.contains(&8) && board.computer_choices.contains(&9) {
+            if available_moves.contains(&7) {
+                return 7
+            }
+        }
+        
+        //check diagonal
+        if board.computer_choices.contains(&1) && board.computer_choices.contains(&5) {
+            if available_moves.contains(&9) {
+                return 9
+            }
+        }
+        if board.computer_choices.contains(&1) && board.computer_choices.contains(&9) {
+            if available_moves.contains(&5) {
+                return 5
+            }
+        }
+        if board.computer_choices.contains(&5) && board.computer_choices.contains(&9) {
+            if available_moves.contains(&1) {
+                return 1
+            }
+        }
+        if board.computer_choices.contains(&3) && board.computer_choices.contains(&5) {
+            if available_moves.contains(&7) {
+                return 7
+            }
+        }
+        if board.computer_choices.contains(&3) && board.computer_choices.contains(&7) {
+            if available_moves.contains(&5) {
+                return 5
+            }
+        }
+        if board.computer_choices.contains(&5) && board.computer_choices.contains(&7) {
+            if available_moves.contains(&3) {
+                return 3
+            }
+        }
+
+        // check down
+        if board.computer_choices.contains(&1) && board.computer_choices.contains(&4) {
+            if available_moves.contains(&7) {
+                return 7
+            }
+        }
+        if board.computer_choices.contains(&1) && board.computer_choices.contains(&7) {
+            if available_moves.contains(&4) {
+                return 4
+            }
+        }
+        if board.computer_choices.contains(&4) && board.computer_choices.contains(&7) {
+            if available_moves.contains(&1) {
+                return 1
+            }
+        }
+        if board.computer_choices.contains(&2) && board.computer_choices.contains(&5) {
+            if available_moves.contains(&8) {
+                return 8
+            }
+        }
+        if board.computer_choices.contains(&2) && board.computer_choices.contains(&8) {
+            if available_moves.contains(&5) {
+                return 5
+            }
+        }
+        if board.computer_choices.contains(&5) && board.computer_choices.contains(&8) {
+            if available_moves.contains(&2) {
+                return 2
+            }
+        }
+        if board.computer_choices.contains(&3) && board.computer_choices.contains(&6) {
+            if available_moves.contains(&9) {
+                return 9
+            }
+        }
+        if board.computer_choices.contains(&3) && board.computer_choices.contains(&9) {
+            if available_moves.contains(&6) {
+                return 6
+            }
+        }
+        if board.computer_choices.contains(&6) && board.computer_choices.contains(&9) {
+            if available_moves.contains(&3) {
+                return 3
+            }
+        }
+        return 0
+    }
 
 }
 
@@ -157,6 +293,8 @@ pub struct Board {
     row_1: Vec<char>,
     row_2: Vec<char>,
     row_3: Vec<char>,
+    player_choices: Vec<u8>,
+    computer_choices: Vec<u8>,
 }
 
 impl Board {
@@ -165,6 +303,8 @@ impl Board {
             row_1: vec!['1', '2', '3'],
             row_2: vec!['4', '5', '6'],
             row_3: vec!['7', '8', '9'],
+            player_choices: vec![],
+            computer_choices: vec![],
         }
     }
 
@@ -172,6 +312,8 @@ impl Board {
         println!("{:?}", self.row_3);
         println!("{:?}", self.row_2);
         println!("{:?}", self.row_1);
+        println!("{:?}", self.player_choices);
+        println!("{:?}", self.computer_choices);
     }
 
     pub fn update(mut self, player: &Player) -> Board {
@@ -193,6 +335,35 @@ impl Board {
             _ => println!("Some shit went bad."),
         }
 
+        if player.player_type == PlayerType::human {
+            match player.move_pick {
+            1 => self.player_choices.push(1),
+            2 => self.player_choices.push(2),
+            3 => self.player_choices.push(3),
+            4 => self.player_choices.push(4),
+            5 => self.player_choices.push(5),
+            6 => self.player_choices.push(6),
+            7 => self.player_choices.push(7),
+            8 => self.player_choices.push(8),
+            9 => self.player_choices.push(9),
+            _ => println!("Shit went bad populating player.choices.vec"),
+            }
+        }
+
+        if player.player_type == PlayerType::cpu {
+            match player.move_pick {
+            1 => self.computer_choices.push(1),
+            2 => self.computer_choices.push(2),
+            3 => self.computer_choices.push(3),
+            4 => self.computer_choices.push(4),
+            5 => self.computer_choices.push(5),
+            6 => self.computer_choices.push(6),
+            7 => self.computer_choices.push(7),
+            8 => self.computer_choices.push(8),
+            9 => self.computer_choices.push(9),
+            _ => println!("Shit went bad populating computer.choices.vec"),
+            }
+        }
         return self
     }
 
