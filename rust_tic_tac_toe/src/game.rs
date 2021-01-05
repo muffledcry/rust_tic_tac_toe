@@ -2,12 +2,9 @@
 // 5. AI checks if corner is available using the get_available method(in progress).
 // 6. Make game loop to check win condition AI (not started)
 
-
-use std::io::*;
 use rand::prelude::*;
-use std::fmt;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Letter {
     X,
     O,
@@ -17,14 +14,14 @@ pub enum Letter {
 
 // }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum PlayerType {
-    human,
-    cpu,
+    Human,
+    Cpu,
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Player {
     pub player_type: PlayerType,
     pub letter: Letter,
@@ -39,14 +36,14 @@ impl Player {
 
         if coin_flip == 0 {
             let human = Player {
-                player_type: PlayerType::human,
+                player_type: PlayerType::Human,
                 letter: Letter::X,
                 move_pick: 0,
             };
                 return human
         }else{
             let human = Player {
-                player_type: PlayerType::human,
+                player_type: PlayerType::Human,
                 letter: Letter::O,
                 move_pick: 0,
             };
@@ -57,14 +54,14 @@ impl Player {
     pub fn new_computer(human: &Player) -> Player {
         if human.letter == Letter::X {
             let computer = Player {
-                player_type: PlayerType::cpu,
+                player_type: PlayerType::Cpu,
                 letter: Letter::O,
                 move_pick: 0,
             };
             return computer
         }else{
             let computer = Player {
-                player_type : PlayerType::cpu,
+                player_type : PlayerType::Cpu,
                 letter: Letter::X,
                 move_pick: 0,
             };
@@ -72,9 +69,9 @@ impl Player {
         }
     }
 
-    pub fn get_move(&self, board: &Board) -> u8 {
+    pub fn get_move(self, board: &Board) -> u8 {
         match self.player_type {
-            PlayerType::human => loop {
+            PlayerType::Human => loop {
                 println!("Please choose a move.");
                 let mut move_pick = String::new();
                 std::io::stdin()
@@ -88,36 +85,72 @@ impl Player {
                     continue;
                 } 
             },
-            PlayerType::cpu => {
+            PlayerType::Cpu => {
+                let player_copy = self.clone();
+                let winning_move = &player_copy.check_win(&board);
+                let blocking_move = &player_copy.block_win(&board);
+
+                if winning_move != &0 {
+                    return *winning_move
+                }
+                if blocking_move != &0 {
+                    return *blocking_move
+                }
+
+
                 let available_moves = self.get_available(board);
+
+                // Pick the center.
                 if available_moves.contains(&5) {
                     return 5
                 }
 
                 //Pick a corner.
-                let corner_rows = vec![1, 3];
-                let mut rng = rand::thread_rng();
-                let row_pick = corner_rows.choose(&mut rng).unwrap();
-                let corner_move = match row_pick {
-                    1 => {
-                        let choices: Vec<u8> = vec![1, 3];
-                        let choice = choices.choose(&mut rng).unwrap();
-                        *choice
-                    },
-                    3 => {
-                        let choices: Vec<u8> = vec![7, 9];
-                        let choice = choices.choose(&mut rng).unwrap();
-                        *choice
-                    },
-                    _ => {
-                        println!("What the fuck happened (line 103)?");
-                        return 0
-                    }
-                };
+                if available_moves.contains(&1) || available_moves.contains(&3) || available_moves.contains(&7)
+                || available_moves.contains(&9) {
+                    let corner_rows = vec![1, 3];
+                    let mut rng = rand::thread_rng();
+                    let row_pick = corner_rows.choose(&mut rng).unwrap();
+                    let corner_move = match row_pick {
+                        1 => {
+                            let choices: Vec<u8> = vec![1, 3];
+                            let choice = choices.choose(&mut rng).unwrap();
+                            *choice
+                        },
+                        3 => {
+                            let choices: Vec<u8> = vec![7, 9];
+                            let choice = choices.choose(&mut rng).unwrap();
+                            *choice
+                        },
+                        _ => {
+                            println!("What the fuck happened (line 103)?");
+                            return 0
+                        }
+                    };
 
-
-
-                return corner_move
+                    return corner_move
+                }else if available_moves.contains(&2) || available_moves.contains(&4) || available_moves.contains(&6)
+                || available_moves.contains(&8) {
+                    let side_rows = vec![1, 2, 3];
+                    let mut rng = rand::thread_rng();
+                    let side_pick = side_rows.choose(&mut rng).unwrap();
+                    let side_move = match side_pick {
+                        1 => 2,
+                        2 => {
+                            let choices: Vec<u8> = vec![4, 6];
+                            let choice = choices.choose(&mut rng).unwrap();
+                            *choice
+                        },
+                        3 => 8,
+                        _ => {
+                            println!("Tozzi's nuts.");
+                            return 100
+                        }
+                    };
+                    return side_move
+                }else{
+                    return 0
+                }
             }
         } 
     }
@@ -285,8 +318,137 @@ impl Player {
         return 0
     }
 
-}
+    pub fn block_win(self, board: &Board) -> u8 {
+        let available_moves = self.get_available(board);
 
+        //Checks Across
+        if board.player_choices.contains(&1) && board.player_choices.contains(&2) {
+            if available_moves.contains(&3) {
+                return 3
+            }
+        }
+        if board.player_choices.contains(&1) && board.player_choices.contains(&3) {
+            if available_moves.contains(&2) {
+                return 2
+            }
+        }
+        if board.player_choices.contains(&2) && board.player_choices.contains(&3) {
+            if available_moves.contains(&1) {
+                return 1
+            }
+        }
+        if board.player_choices.contains(&4) && board.player_choices.contains(&5) {
+            if available_moves.contains(&6) {
+                return 6
+            }
+        }
+        if board.player_choices.contains(&4) && board.player_choices.contains(&6) {
+            if available_moves.contains(&5) {
+                return 5
+            }
+        }
+        if board.player_choices.contains(&5) && board.player_choices.contains(&6) {
+            if available_moves.contains(&4) {
+                return 4
+            }
+        }
+        if board.player_choices.contains(&7) && board.player_choices.contains(&8) {
+            if available_moves.contains(&9) {
+                return 9
+            }
+        }
+        if board.player_choices.contains(&7) && board.player_choices.contains(&9) {
+            if available_moves.contains(&8) {
+                return 8
+            }
+        }
+        if board.player_choices.contains(&8) && board.player_choices.contains(&9) {
+            if available_moves.contains(&7) {
+                return 7
+            }
+        }
+        
+        //check diagonal
+        if board.player_choices.contains(&1) && board.player_choices.contains(&5) {
+            if available_moves.contains(&9) {
+                return 9
+            }
+        }
+        if board.player_choices.contains(&1) && board.player_choices.contains(&9) {
+            if available_moves.contains(&5) {
+                return 5
+            }
+        }
+        if board.player_choices.contains(&5) && board.player_choices.contains(&9) {
+            if available_moves.contains(&1) {
+                return 1
+            }
+        }
+        if board.player_choices.contains(&3) && board.player_choices.contains(&5) {
+            if available_moves.contains(&7) {
+                return 7
+            }
+        }
+        if board.player_choices.contains(&3) && board.player_choices.contains(&7) {
+            if available_moves.contains(&5) {
+                return 5
+            }
+        }
+        if board.player_choices.contains(&5) && board.player_choices.contains(&7) {
+            if available_moves.contains(&3) {
+                return 3
+            }
+        }
+
+        // check down
+        if board.player_choices.contains(&1) && board.player_choices.contains(&4) {
+            if available_moves.contains(&7) {
+                return 7
+            }
+        }
+        if board.player_choices.contains(&1) && board.player_choices.contains(&7) {
+            if available_moves.contains(&4) {
+                return 4
+            }
+        }
+        if board.player_choices.contains(&4) && board.player_choices.contains(&7) {
+            if available_moves.contains(&1) {
+                return 1
+            }
+        }
+        if board.player_choices.contains(&2) && board.player_choices.contains(&5) {
+            if available_moves.contains(&8) {
+                return 8
+            }
+        }
+        if board.player_choices.contains(&2) && board.player_choices.contains(&8) {
+            if available_moves.contains(&5) {
+                return 5
+            }
+        }
+        if board.player_choices.contains(&5) && board.player_choices.contains(&8) {
+            if available_moves.contains(&2) {
+                return 2
+            }
+        }
+        if board.player_choices.contains(&3) && board.player_choices.contains(&6) {
+            if available_moves.contains(&9) {
+                return 9
+            }
+        }
+        if board.player_choices.contains(&3) && board.player_choices.contains(&9) {
+            if available_moves.contains(&6) {
+                return 6
+            }
+        }
+        if board.player_choices.contains(&6) && board.player_choices.contains(&9) {
+            if available_moves.contains(&3) {
+                return 3
+            }
+        }
+        return 0
+    }
+}
 
 #[derive(PartialEq, Debug)]
 pub struct Board {
@@ -309,11 +471,10 @@ impl Board {
     }
 
     pub fn draw_board(&mut self) {
+        println!("");
         println!("{:?}", self.row_3);
         println!("{:?}", self.row_2);
         println!("{:?}", self.row_1);
-        println!("{:?}", self.player_choices);
-        println!("{:?}", self.computer_choices);
     }
 
     pub fn update(mut self, player: &Player) -> Board {
@@ -335,7 +496,7 @@ impl Board {
             _ => println!("Some shit went bad."),
         }
 
-        if player.player_type == PlayerType::human {
+        if player.player_type == PlayerType::Human {
             match player.move_pick {
             1 => self.player_choices.push(1),
             2 => self.player_choices.push(2),
@@ -350,7 +511,7 @@ impl Board {
             }
         }
 
-        if player.player_type == PlayerType::cpu {
+        if player.player_type == PlayerType::Cpu {
             match player.move_pick {
             1 => self.computer_choices.push(1),
             2 => self.computer_choices.push(2),
